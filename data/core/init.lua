@@ -13,6 +13,9 @@ local core = {}
 
 
 local function project_scan_thread()
+  local entries_count = 0
+  local max_entries = config.max_project_files
+
   local function diff_files(a, b)
     if #a ~= #b then return true end
     for i, v in ipairs(a) do
@@ -40,7 +43,13 @@ local function project_scan_thread()
         local info = system.get_file_info(file)
         if info and info.size < size_limit then
           info.filename = file
-          table.insert(info.type == "dir" and dirs or files, info)
+          if(info.type == "dir") then
+            table.insert(dirs, info)
+            else
+            table.insert(files, info)
+            entries_count = entries_count + 1
+            if entries_count >= max_entries then break end
+          end
         end
       end
     end
@@ -48,7 +57,7 @@ local function project_scan_thread()
     table.sort(dirs, compare_file)
     for _, f in ipairs(dirs) do
       table.insert(t, f)
-      get_files(f.filename, t)
+      if entries_count < max_entries then get_files(f.filename, t) end
     end
 
     table.sort(files, compare_file)
@@ -56,13 +65,20 @@ local function project_scan_thread()
       table.insert(t, f)
     end
 
-    return t
+    local overflow = entries_count >= max_entries
+    entries_count = 0
+    return t, overflow
   end
 
+  local notified = false
   while true do
     -- get project files and replace previous table if the new table is
     -- different
-    local t = get_files(".")
+    local t, overflow = get_files(".")
+    if not notified and overflow then
+      core.error("Too many files in project directory: stopped reading at "..config.max_project_files.." files. Increase config.max_project_files")
+      notified = true
+    end
     if diff_files(core.project_files, t) then
       core.project_files = t
       core.redraw = true
