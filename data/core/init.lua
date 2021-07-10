@@ -45,7 +45,6 @@ local function project_scan_thread()
     local path_mask = core.project_delta..PATHSEP
     local path_delta = (path:sub(0, #path_mask) == path_mask) and path:sub(#path_mask+1) or path
 
-    if entries_count > config.project_max_files then return t, entries_count end
     for _, file in ipairs(all) do
       if not common.match_pattern(file, config.ignore_files) then
         local project_file = (path ~= "." and path .. PATHSEP or "") .. file
@@ -65,12 +64,13 @@ local function project_scan_thread()
           end
         end
       end
+      if entries_count >= config.project_max_files then break end
     end
 
     table.sort(dirs, compare_file)
     for _, f in ipairs(dirs) do
       table.insert(t, f)
-      if entries_count <= config.project_max_files then get_files(f.filename, t) end
+      if entries_count < config.project_max_files then get_files(f.filename, t) end
     end
 
     table.sort(files, compare_file)
