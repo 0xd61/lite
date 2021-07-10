@@ -47,7 +47,7 @@ DocView.translate = {
   end,
 }
 
-local blink_period = 0.8
+local blink_period = 1.5
 
 
 function DocView:new(doc)

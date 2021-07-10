@@ -484,7 +484,7 @@ function core.run()
     local did_redraw = core.step()
     run_threads()
     if not did_redraw and not system.window_has_focus() then
-      system.wait_event(0.25)
+      system.wait_event(0.5)
     end
     local elapsed = system.get_time() - core.frame_start
     system.sleep(math.max(0, 1 / config.fps - elapsed))
