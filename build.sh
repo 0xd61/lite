@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cflags="-Wall -O3 -g -std=gnu11 -fno-strict-aliasing -Isrc"
+cflags="-Wall -O3 -ffast-math -msse4.2 -mavx2 -maes -g -std=gnu11 -fno-strict-aliasing -Isrc"
 lflags="-lSDL2 -lm"
 
 if [[ $* == *windows* ]]; then
@@ -14,7 +14,7 @@ if [[ $* == *windows* ]]; then
 else
   platform="unix"
   outfile="lite"
-  compiler="gcc"
+  compiler="clang"
   cflags="$cflags -DLUA_USE_POSIX"
   lflags="$lflags -o $outfile"
 fi
