@@ -69,6 +69,28 @@ command.add(nil, {
     end)
   end,
 
+  ["core:set-project-root"] = function()
+    local initial_text = core.project_delta
+    if initial_text == "." then initial_text = "" end
+    core.command_view:set_text(initial_text)
+    core.command_view:enter("Enter Project Root Directory", function(text, item)
+      if text == "" then
+        core.project_delta = "."
+      else
+        text = item and item.text or text
+        core.project_delta = text
+      end
+    end, function(text)
+      local files = {}
+      for _, item in pairs(core.project_files) do
+        if item.type == "dir" then
+          table.insert(files, item.filename)
+        end
+      end
+      return common.fuzzy_match(files, text)
+    end)
+  end,
+
   ["core:new-doc"] = function()
     core.root_view:open_doc(core.open_doc())
   end,

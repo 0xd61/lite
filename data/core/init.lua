@@ -13,9 +13,6 @@ local core = {}
 
 
 local function project_scan_thread()
-  local entries_count = 0
-  local max_entries = config.max_project_files
-
   local function diff_files(a, b)
     if #a ~= #b then return true end
     for i, v in ipairs(a) do
@@ -30,25 +27,37 @@ local function project_scan_thread()
     return a.filename < b.filename
   end
 
+  local function get_depth(filename)
+    local n = 0
+    for sep in filename:gmatch("[\\/]") do
+      n = n + 1
+    end
+    return n
+  end
+
   local function get_files(path, t)
     coroutine.yield()
     t = t or {}
     local size_limit = config.file_size_limit * 10e5
     local all = system.list_dir(path) or {}
     local dirs, files = {}, {}
+    local path_mask = core.project_delta..PATHSEP
+    local path_delta = (path:sub(0, #path_mask) == path_mask) and path:sub(#path_mask+1) or path
 
     for _, file in ipairs(all) do
       if not common.match_pattern(file, config.ignore_files) then
-        local file = (path ~= "." and path .. PATHSEP or "") .. file
-        local info = system.get_file_info(file)
+        local project_file = (path ~= "." and path .. PATHSEP or "") .. file
+        local info = system.get_file_info(project_file)
         if info and info.size < size_limit then
-          info.filename = file
+          info.filename = project_file
           if(info.type == "dir") then
             table.insert(dirs, info)
-            else
-            table.insert(files, info)
-            entries_count = entries_count + 1
-            if entries_count >= max_entries then break end
+          else
+            local project_delta_file = path_delta .. file
+            local depth = get_depth(project_delta_file)
+            if depth <= config.project_scan_depth then
+              table.insert(files, info)
+            end
           end
         end
       end
@@ -57,7 +66,7 @@ local function project_scan_thread()
     table.sort(dirs, compare_file)
     for _, f in ipairs(dirs) do
       table.insert(t, f)
-      if entries_count < max_entries then get_files(f.filename, t) end
+      get_files(f.filename, t)
     end
 
     table.sort(files, compare_file)
@@ -65,20 +74,13 @@ local function project_scan_thread()
       table.insert(t, f)
     end
 
-    local overflow = entries_count >= max_entries
-    entries_count = 0
-    return t, overflow
+    return t
   end
 
-  local notified = false
   while true do
     -- get project files and replace previous table if the new table is
     -- different
-    local t, overflow = get_files(".")
-    if not notified and overflow then
-      core.error("Too many files in project directory: stopped reading at "..config.max_project_files.." files. Increase config.max_project_files")
-      notified = true
-    end
+    local t = get_files(core.project_delta)
     if diff_files(core.project_files, t) then
       core.project_files = t
       core.redraw = true
@@ -117,6 +119,7 @@ function core.init()
   core.docs = {}
   core.threads = setmetatable({}, { __mode = "k" })
   core.project_files = {}
+  core.project_delta = "."
   core.redraw = true
 
   core.root_view = RootView()
