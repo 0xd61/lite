@@ -35,6 +35,7 @@ local function project_scan_thread()
     return n
   end
 
+  local entries_count = 0
   local function get_files(path, t)
     coroutine.yield()
     t = t or {}
@@ -44,6 +45,7 @@ local function project_scan_thread()
     local path_mask = core.project_delta..PATHSEP
     local path_delta = (path:sub(0, #path_mask) == path_mask) and path:sub(#path_mask+1) or path
 
+    if entries_count > config.project_max_files then return t, entries_count end
     for _, file in ipairs(all) do
       if not common.match_pattern(file, config.ignore_files) then
         local project_file = (path ~= "." and path .. PATHSEP or "") .. file
@@ -52,10 +54,12 @@ local function project_scan_thread()
           info.filename = project_file
           if(info.type == "dir") then
             table.insert(dirs, info)
+            entries_count = entries_count + 1
           else
             local project_delta_file = path_delta .. file
             local depth = get_depth(project_delta_file)
             if depth <= config.project_scan_depth then
+              entries_count = entries_count + 1
               table.insert(files, info)
             end
           end
@@ -66,7 +70,7 @@ local function project_scan_thread()
     table.sort(dirs, compare_file)
     for _, f in ipairs(dirs) do
       table.insert(t, f)
-      get_files(f.filename, t)
+      if entries_count <= config.project_max_files then get_files(f.filename, t) end
     end
 
     table.sort(files, compare_file)
@@ -74,13 +78,20 @@ local function project_scan_thread()
       table.insert(t, f)
     end
 
-    return t
+    return t, entries_count
   end
 
+  local notified = false
   while true do
     -- get project files and replace previous table if the new table is
     -- different
-    local t = get_files(core.project_delta)
+    entries_count = 0
+    local t, file_count = get_files(core.project_delta)
+    if not notified and file_count > config.project_max_files then
+      core.error("Too many files in project directory: stopped reading at "..
+            config.project_max_files.." files. Increase config.project_max_files")
+      notified = true
+    end
     if diff_files(core.project_files, t) then
       core.project_files = t
       core.redraw = true
