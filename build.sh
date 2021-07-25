@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cflags="-Wall -O3 -ffast-math -msse4.2 -mavx2 -maes -g -std=gnu11 -fno-strict-aliasing -Isrc"
-lflags="-lSDL2 -lm"
+lflags="-lm"
 
 if [[ $* == *windows* ]]; then
   platform="windows"
@@ -15,8 +15,8 @@ else
   platform="unix"
   outfile="lite"
   compiler="clang"
-  cflags="$cflags -DLUA_USE_POSIX"
-  lflags="$lflags -o $outfile"
+  cflags="$cflags `sdl2-config --cflags` -DLUA_USE_POSIX"
+  lflags="$lflags `sdl2-config --static-libs` -o $outfile"
 fi
 
 if command -v ccache >/dev/null; then
