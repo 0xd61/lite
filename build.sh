@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cflags="-Wall -O3 -ffast-math -msse4.2 -mavx2 -maes -g -std=gnu11 -fno-strict-aliasing -Isrc"
+cflags="-Wall -O3 -msse4.2 -mavx2 -maes -g -std=gnu11 -fno-strict-aliasing -Isrc"
 lflags="-lm"
 
 if [[ $* == *windows* ]]; then
