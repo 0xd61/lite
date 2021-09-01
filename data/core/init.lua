@@ -432,8 +432,10 @@ function core.step()
   end
 
   -- update window title
-  local name = core.active_view:get_name()
-  local title = (name ~= "---") and (name .. " - lite") or  "lite"
+  -- local name = core.active_view:get_name()
+  local name = system.absolute_path(core.project_delta)
+  local stripped_name = name:match("^.+/(.+/.+)$" ) or name
+  local title = (stripped_name ~= "---") and (stripped_name .. " - lite") or  "lite"
   if title ~= core.window_title then
     system.set_window_title(title)
     core.window_title = title
