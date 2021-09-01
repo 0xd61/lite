@@ -140,7 +140,7 @@ function core.init()
   core.root_view.root_node:split("down", core.command_view, true)
   core.root_view.root_node.b:split("down", core.status_view, true)
 
-  core.add_thread(project_scan_thread)
+  core.add_thread(project_scan_thread, "project_scan")
   command.add_defaults()
   local got_plugin_error = not core.load_plugins()
   local got_user_error = not core.try(require, "user")

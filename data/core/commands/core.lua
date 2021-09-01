@@ -80,6 +80,9 @@ command.add(nil, {
         text = item and item.text or text
         core.project_delta = text
       end
+
+      -- NOTE(dgl): run thread on next loop
+      core.threads["project_scan"].wake = 0
     end, function(text)
       local files = {}
       for _, item in pairs(core.project_files) do
