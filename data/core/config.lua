@@ -18,5 +18,6 @@ config.line_height = 1.2
 config.indent_size = 2
 config.tab_type = "soft"
 config.line_limit = 80
+config.temp_file_prefix = ".lite_temp_"
 
 return config
