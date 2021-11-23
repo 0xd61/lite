@@ -94,6 +94,11 @@ command.add(nil, {
     end)
   end,
 
+  ["core:reload-files"] = function()
+    -- NOTE(dgl): run thread on next loop
+    core.threads["project_scan"].wake = 0
+  end,
+
   ["core:new-doc"] = function()
     core.root_view:open_doc(core.open_doc())
   end,
