@@ -73,25 +73,21 @@ command.add(nil, {
     local initial_text = core.project_delta
     if initial_text == "." then initial_text = "" end
     core.command_view:set_text(initial_text)
-    core.command_view:enter("Enter Project Root Directory", function(text, item)
+    core.command_view:enter("Enter Project Root Directory", function(text)
       if text == "" then
         core.project_delta = "."
       else
-        text = item and item.text or text
-        core.project_delta = text
+        local info = system.get_file_info(text) or {}
+        if info.type == "dir" then
+          core.project_delta = text
+        else
+          core.error("Invalid project root")
+        end
       end
 
       -- NOTE(dgl): run thread on next loop
       core.threads["project_scan"].wake = 0
-    end, function(text)
-      local files = {}
-      for _, item in pairs(core.project_files) do
-        if item.type == "dir" then
-          table.insert(files, item.filename)
-        end
-      end
-      return common.fuzzy_match(files, text)
-    end)
+    end, common.path_suggest)
   end,
 
   ["core:reload-files"] = function()
