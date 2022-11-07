@@ -396,13 +396,17 @@ function RootView:get_active_node()
   return self.root_node:get_node_for_view(core.active_view)
 end
 
-
-function RootView:open_doc(doc)
+function RootView:get_active_unlocked_node()
   local node = self:get_active_node()
   if node.locked and core.last_active_view then
     core.set_active_view(core.last_active_view)
     node = self:get_active_node()
   end
+  return node
+end
+
+function RootView:open_doc(doc)
+  local node = self:get_active_unlocked_node()
   assert(not node.locked, "Cannot open doc on locked node")
   for i, view in ipairs(node.views) do
     if view.doc == doc then
