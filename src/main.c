@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
   int (*SetProcessDPIAware)() = (void*) GetProcAddress(lib, "SetProcessDPIAware");
   SetProcessDPIAware();
 #endif
-
+  printf("Some test\n");
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   SDL_EnableScreenSaver();
   SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
@@ -115,6 +115,7 @@ int main(int argc, char **argv) {
   get_exe_filename(exename, sizeof(exename));
   lua_pushstring(L, exename);
   lua_setglobal(L, "EXEFILE");
+  fprintf(stderr, "exe file %s\n", exename);
 
 
   (void) luaL_dostring(L,

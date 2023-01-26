@@ -5,6 +5,10 @@
 #include "lib/stb/stb_truetype.h"
 #include "renderer.h"
 
+#if _MSC_VER
+#include <stdlib.h>
+#endif
+
 #define MAX_GLYPHSET 256
 
 struct RenImage {

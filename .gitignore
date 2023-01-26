@@ -1,0 +1,8 @@
+*.obj
+*.pdb
+*.res
+*.exe
+*.dll
+lite.zip
+/.vs/
+/data/plugins/

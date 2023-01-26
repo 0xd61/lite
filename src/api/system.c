@@ -1,8 +1,12 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <ctype.h>
+#if _MSC_VER
+#include "dirent.h"
+#else
 #include <dirent.h>
 #include <unistd.h>
+#endif
 #include <errno.h>
 #include <sys/stat.h>
 #include "api.h"
