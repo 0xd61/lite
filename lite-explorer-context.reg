@@ -1,0 +1,31 @@
+Windows Registry Editor Version 5.00
+; Open files
+; Default Git-Bash Location T:\lite.exe
+
+[HKEY_CLASSES_ROOT\*\shell\lite]
+@="Open with lite"
+"Icon"="T:\\lite\\lite.exe"
+
+[HKEY_CLASSES_ROOT\*\shell\lite\command]
+@="\"T:\\lite\\lite.exe\" %w %1"
+
+; This will make it appear when you right click ON a folder
+; The "Icon" line can be removed if you don't want the icon to appear
+
+[HKEY_CLASSES_ROOT\Directory\shell\lite]
+@="Open in lite"
+"Icon"="T:\\lite\\lite.exe"
+
+
+[HKEY_CLASSES_ROOT\Directory\shell\lite\command]
+@="\"T:\\lite\\lite.exe\" %w"
+
+; This will make it appear when you right click INSIDE a folder
+; The "Icon" line can be removed if you don't want the icon to appear
+
+[HKEY_CLASSES_ROOT\Directory\Background\lite\bash]
+@="Open in lite"
+"Icon"="T:\\lite\\lite.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\lite\command]
+@="\"T:\\lite\\lite.exe\" %w"
