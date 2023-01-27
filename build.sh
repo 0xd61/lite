@@ -6,11 +6,11 @@ lflags="-lm"
 if [[ $* == *windows* ]]; then
   platform="windows"
   outfile="lite.exe"
-  compiler="clang"
-  cflags="$cflags -DLUA_USE_POPEN -Iwinlib/SDL2-2.26.2/include"
-  lflags="$lflags -Lwinlib/SDL2-2.26.2/lib/x64"
-  lflags="-lSDL2main $lflags -mwindows -o $outfile res.res"
-  #x86_64-w64-mingw32-windres res.rc -O coff -o res.res
+  compiler="x86_64-w64-mingw32-gcc"
+  cflags="$cflags -DLUA_USE_POPEN -Iwinlib/SDL2-2.0.10/x86_64-w64-mingw32/include"
+  lflags="$lflags -Lwinlib/SDL2-2.0.10/x86_64-w64-mingw32/lib"
+  lflags="-lmingw32 -lSDL2main $lflags -mwindows -o $outfile res.res"
+  x86_64-w64-mingw32-windres res.rc -O coff -o res.res
 else
   platform="unix"
   outfile="lite"

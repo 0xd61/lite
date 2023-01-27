@@ -2,12 +2,11 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#include "lib/stb/stb_truetype.h"
-#include "renderer.h"
-
 #if _MSC_VER
 #include <stdlib.h>
 #endif
+#include "lib/stb/stb_truetype.h"
+#include "renderer.h"
 
 #define MAX_GLYPHSET 256
 
